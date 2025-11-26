@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dr. Juan Pérez | Patología Clínica</title>
+
+  <!-- Favicons / fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Calibre:wght@400;500;600&family=SF+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <!-- FullCalendar -->
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+  <div class="root">
+    <!-- HEADER -->
+    <header class="header">
+      <nav class="nav">
+        <div class="nav__inner">
+          <div class="links">
+            <a href="#about" class="link">Sobre mí</a>
+            <a href="#experience" class="link">Experiencia</a>
+            <a href="#agenda" class="link">Agenda</a>
+            <a href="#contact" class="link">Contacto</a>
+          </div>
+          <button id="theme-toggle" class="theme-toggle" aria-label="Cambiar tema" data-tooltip="Cambiar a modo claro">
+            🌙
+          </button>
+          <a href="#agenda" class="cta-btn">Agendar consulta</a>
+        </div>
+      </nav>
+    </header>
+
+    <!-- MAIN -->
+    <main id="content" class="main">
+      <!-- SECCIÓN HERO -->
+      <section id="hero" class="hero">
+        <h1 class="hero__title">
+          <span>Dr. Juan Pérez</span>
+          <span class="hero__subtitle">Patología clínica · 35 años de experiencia</span>
+        </h1>
+        <p class="hero__description">
+          Diagnóstico preciso, confianza absoluta. Especialista en biopsias,
+          citologías y autopsias. Más de 25&nbsp;000 casos analizados.
+        </p>
+        <div class="hero__cta">
+          <a href="#agenda" class="btn">Consultar disponibilidad</a>
+        </div>
+      </section>
+
+      <!-- ABOUT -->
+      <section id="about" class="about">
+        <h2 class="section-heading">Sobre mí</h2>
+        <div class="about__inner">
+          <div class="about__text">
+            <p>
+              Me gradué en la Universidad Nacional de Córdoba en 1988 y me
+              especialicé en Patología en el Hospital General. Durante tres
+              décadas he dedicado mi carrera al diagnóstico histopatológico,
+              contribuyendo a la prevención y tratamiento de enfermedades
+              oncológicas y autoinmunes.
+            </p>
+            <p>
+              Mi enfoque combina la rigurosidad científica con la empatía
+              humana, brindando resultados claros y oportunos a médicos y
+              pacientes.
+            </p>
+
+            <ul class="skills-list">
+              <li>Histopatología</li>
+              <li>Citología</li>
+              <li>Autopsias</li>
+              <li>Biopsias por BACAF</li>
+              <li>Inmunohistoquímica</li>
+              <li>Medicina transfusional</li>
+            </ul>
+          </div>
+          <div class="about__photo">
+            <img src="assets/portrait.jpg" alt="Dr. Juan Pérez" />
+          </div>
+        </div>
+      </section>
+
+      <!-- EXPERIENCIA -->
+      <section id="experience" class="experience">
+        <h2 class="section-heading">Experiencia</h2>
+        <div class="experience__inner">
+          <div class="jobs">
+            <div class="job">
+              <div class="job__head">
+                <h3>Jefe del Departamento de Patología</h3>
+                <span class="job__company">Instituto de Alta Complejidad</span>
+              </div>
+              <p class="job__time">2010 – Presente</p>
+              <ul class="job__list">
+                <li>Coordino el equipo de 12 patólogos y tecnólogos</li>
+                <li>Superviso más de 3 000 biopsias al año</li>
+                <li>Implementé sistema de calidad ISO 15189</li>
+              </ul>
+            </div>
+
+            <div class="job">
+              <div class="job__head">
+                <h3>Patólogo Adjunto</h3>
+                <span class="job__company">Hospital San Martín</span>
+              </div>
+              <p class="job__time">1998 – 2010</p>
+              <ul class="job__list">
+                <li>Diagnóstico de neoplasias hematológicas</li>
+                <li>Docencia de residentes de anatomía patológica</li>
+              </ul>
+            </div>
+
+            <div class="job">
+              <div class="job__head">
+                <h3>Médico Residente</h3>
+                <span class="job__company">Hospital General</span>
+              </div>
+              <p class="job__time">1994 – 1998</p>
+              <ul class="job__list">
+                <li>Formación en citología y autopsias</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- AGENDA (Projects) -->
+      <section id="agenda" class="agenda">
+        <h2 class="section-heading">Agenda</h2>
+        <p class="section-subtitle">
+          Selecciona un día y horario disponible. Las citas duran 30 min.
+        </p>
+
+        <div class="agenda__grid">
+          <div class="agenda__cal">
+            <div id="calendar"></div>
+          </div>
+          <div class="agenda__note">
+            <p>
+              Los horarios se muestran en tu zona horaria.
+              Recibirás un correo de confirmación y un enlace para cancelar o
+              reprogramar.
+            </p>
+          </div>
+        </div>
+
+        <!-- FORMULARIO OCULTO HASTA SELECCIONAR SLOT -->
+        <form id="form-reserva" class="form-reserva hidden">
+          <h3>Completa tus datos</h3>
+          <label>
+            Nombre completo
+            <input type="text" name="nombre" required />
+          </label>
+          <label>
+            Correo
+            <input type="email" name="email" required />
+          </label>
+          <label>
+            Teléfono / WhatsApp
+            <input type="tel" name="telefono" required />
+          </label>
+          <label>
+            Motivo de la consulta
+            <textarea name="motivo" rows="3"></textarea>
+          </label>
+          <button type="submit" class="btn">Confirmar reserva</button>
+        </form>
+      </section>
+
+      <!-- CONTACTO -->
+      <section id="contact" class="contact">
+        <h2 class="section-heading">Contacto</h2>
+        <p class="section-subtitle">
+          ¿Preguntas? Escríbeme por WhatsApp o correo. Respondo en menos de 24 h.
+        </p>
+
+        <div class="contact__boxes">
+          <a class="contact__box" href="https://wa.me/5493412345678" target="_blank" rel="noopener">
+            <span class="contact__icon">📲</span>
+            <h3>WhatsApp</h3>
+            <p>+54 9 341 234-5678</p>
+          </a>
+
+          <a class="contact__box" href="mailto:info@drjuanperez.com">
+            <span class="contact__icon">✉</span>
+            <h3>Correo</h3>
+            <p>info@drjuanperez.com</p>
+          </a>
+        </div>
+      </section>
+
+      <!-- FOOTER -->
+      <footer class="footer">
+        <div class="footer__content">
+          <small>© 2025 Dr. Juan Pérez · Diseñado con &hearts; para pacientes</small>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script src="js/calendar.js"></script>
+</body>
+</html>
