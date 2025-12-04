@@ -27,10 +27,3 @@ toggleButton.addEventListener('click', () => {
   localStorage.setItem('theme', newTheme);
   updateIcon(newTheme);
 });
-
-// Actualizar ícono
-function updateIcon(theme) {
-  const isDark = theme === 'dark';
-  toggleButton.textContent = isDark ? '🌙' : '☀️';
-  toggleButton.setAttribute('data-tooltip', isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
-}
