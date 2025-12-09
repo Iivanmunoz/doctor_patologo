@@ -1,294 +1,157 @@
-// calendar.js - Versión mejorada con vistas múltiples
-document.addEventListener("DOMContentLoaded", () => {
-  const calendarEl = document.getElementById("calendar");
-  const modal = document.getElementById("appointmentModal");
-  const form = document.getElementById("form-reserva");
-  let selectedSlot = null;
-  let calendar = null;
+/* calendar.js – refactored para “mes → horarios → formulario” */
+document.addEventListener('DOMContentLoaded', () => {
+  const calendarEl   = document.getElementById('calendar');
+  const modal        = document.getElementById('appointmentModal');
+  const form         = document.getElementById('form-reserva');
+  const slotsWrapper = document.createElement('div'); // contenedor dinámico
+  slotsWrapper.className = 'slots-wrapper';
+  form.before(slotsWrapper);
 
-  // Eventos de ejemplo (puedes eliminarlos cuando conectes con tu API)
+  let calendar      = null;
+  let selectedSlot  = null;   // fecha+hora completa seleccionada
+  let selectedDate  = null;   // día que pinchó el usuario
+
+  /* 1. Eventos de muestra (puedes conectar tu API después) */
   const sampleEvents = [
-    {
-      title: 'Consulta General - Juan Pérez',
-      start: '2024-12-05T09:00:00',
-      end: '2024-12-05T09:30:00',
-      backgroundColor: '#64ffda',
-      borderColor: '#64ffda',
-      textColor: '#0a192f'
-    },
-    {
-      title: 'Revisión - María López',
-      start: '2024-12-05T11:00:00',
-      end: '2024-12-05T11:30:00',
-      backgroundColor: '#64ffda',
-      borderColor: '#64ffda',
-      textColor: '#0a192f'
-    },
-    {
-      title: 'Consulta - Carlos Ruiz',
-      start: '2024-12-06T10:00:00',
-      end: '2024-12-06T10:30:00',
-      backgroundColor: '#64ffda',
-      borderColor: '#64ffda',
-      textColor: '#0a192f'
-    },
-    {
-      title: 'Biopsia - Ana García',
-      start: '2024-12-09T14:00:00',
-      end: '2024-12-09T14:30:00',
-      backgroundColor: '#64ffda',
-      borderColor: '#64ffda',
-      textColor: '#0a192f'
-    }
+    { title:'Consulta General - Juan Pérez', start:'2024-12-05T09:00:00', end:'2024-12-05T09:30:00', backgroundColor:'#64ffda', borderColor:'#64ffda', textColor:'#0a192f' },
+    { title:'Revisión - María López',      start:'2024-12-05T11:00:00', end:'2024-12-05T11:30:00', backgroundColor:'#64ffda', borderColor:'#64ffda', textColor:'#0a192f' },
+    { title:'Consulta - Carlos Ruiz',      start:'2024-12-06T10:00:00', end:'2024-12-06T10:30:00', backgroundColor:'#64ffda', borderColor:'#64ffda', textColor:'#0a192f' },
+    { title:'Biopsia - Ana García',        start:'2024-12-09T14:00:00', end:'2024-12-09T14:30:00', backgroundColor:'#64ffda', borderColor:'#64ffda', textColor:'#0a192f' }
   ];
 
-  // Inicializar FullCalendar
+  /* 2. Generar horarios disponibles de 8:00-18:00 (30 min) para un día dado */
+  function generateSlots(day) {
+    const slots = [];
+    const start = new Date(day);
+    start.setHours(8, 0, 0, 0);
+    const end = new Date(day);
+    end.setHours(18, 0, 0, 0);
+
+    while (start < end) {
+      const iso = start.toISOString();
+      /* ocupado = evento que coincide con este slot */
+      const busy = sampleEvents.some(ev =>
+        new Date(ev.start) <= start && new Date(ev.end) > start
+      );
+      slots.push({ iso, time: start.toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit', hour12:false}), busy });
+      start.setMinutes(start.getMinutes() + 30);
+    }
+    return slots;
+  }
+
+  /* 3. Renderizar botones de horarios dentro del modal */
+  function renderSlots(slots) {
+    slotsWrapper.innerHTML = '<p><strong>Horarios disponibles el día seleccionado:</strong></p>';
+    slots.forEach(s => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = s.busy ? 'slot-btn busy' : 'slot-btn free';
+      btn.textContent = s.time;
+      if (!s.busy) {
+        btn.addEventListener('click', () => {
+          selectedSlot = new Date(s.iso);
+          showForm();           // pasamos a la pantalla de formulario
+        });
+      }
+      slotsWrapper.appendChild(btn);
+    });
+  }
+
+  /* 4. Mostrar/ocultar pantallas dentro del modal */
+  function showSlots() {
+    slotsWrapper.style.display = 'block';
+    form.style.display        = 'none';
+    document.getElementById('modalSubtitle').textContent = 'Selecciona un horario disponible:';
+  }
+  function showForm() {
+    slotsWrapper.style.display = 'none';
+    form.style.display         = 'block';
+    /* rellenar fecha/hora en el form */
+    document.getElementById('selectedDate').textContent = selectedSlot.toLocaleDateString('es-ES', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+    document.getElementById('selectedTime').textContent = selectedSlot.toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit', hour12:false});
+    document.getElementById('modalSubtitle').textContent = 'Completa el formulario para confirmar tu cita:';
+  }
+
+  /* 5. Abrir modal (viene del dateClick) */
+  function openModal(dayDate) {
+    selectedDate = dayDate;
+    renderSlots(generateSlots(dayDate));
+    showSlots();
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal() {
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+    form.reset();
+    selectedSlot = null;
+    selectedDate = null;
+  }
+
+  /* 6. Inicializar FullCalendar – solo vista mes */
   calendar = new FullCalendar.Calendar(calendarEl, {
-    initialView: "dayGridMonth",
+    initialView: 'dayGridMonth',
     locale: 'es',
-    headerToolbar: false, // Usamos controles personalizados
-    slotMinTime: "08:00:00",
-    slotMaxTime: "18:00:00",
-    slotDuration: "00:30:00",
-    allDaySlot: false,
-    height: "auto",
-    expandRows: true,
-    slotLabelFormat: {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false
-    },
-    eventTimeFormat: {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false
-    },
-    
-    // Usar eventos de ejemplo o conectar con API
-    events: sampleEvents,
-    // Para usar tu API, descomenta la siguiente línea:
-    // events: "/api/availability",
-    
-    // Cuando se hace clic en una fecha/hora
+    headerToolbar: false,   // usamos los botones propios
+    height: 'auto',
+    events: sampleEvents,   // cambia por tu endpoint cuando tengas API
     dateClick(info) {
       const now = new Date();
-      
-      // No permitir agendar en fechas pasadas
-      if (info.date < now) {
+      if (info.date < now.setHours(0,0,0,0)) {
         showAlert('❌ No puedes agendar citas en fechas pasadas', 'error');
         return;
       }
-      
-      selectedSlot = info.date;
       openModal(info.date);
     },
-
-    // Cuando se hace clic en un evento existente
     eventClick(info) {
-      showAlert(`📋 Cita: ${info.event.title}`, 'info');
+      showAlert(`📋 Cita existente: ${info.event.title}`, 'info');
       info.jsEvent.preventDefault();
     }
   });
-
   calendar.render();
 
-  // ============================================
-  // CONTROLES DE NAVEGACIÓN PERSONALIZADOS
-  // ============================================
-  
-  document.getElementById('prevBtn').addEventListener('click', () => {
-    calendar.prev();
-  });
+  /* 7. Navegación mes anterior/siguiente / hoy */
+  document.getElementById('prevBtn')?.addEventListener('click', () => calendar.prev());
+  document.getElementById('nextBtn')?.addEventListener('click', () => calendar.next());
+  document.getElementById('todayBtn')?.addEventListener('click', () => calendar.today());
 
-  document.getElementById('nextBtn').addEventListener('click', () => {
-    calendar.next();
-  });
+  /* 8. Cerrar modal */
+  document.getElementById('closeModal')?.addEventListener('click', closeModal);
+  modal.querySelector('.appointment-modal__overlay')?.addEventListener('click', closeModal);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && modal.classList.contains('active')) closeModal(); });
 
-  document.getElementById('todayBtn').addEventListener('click', () => {
-    calendar.today();
-  });
-
-  // ============================================
-  // CAMBIAR VISTA (DÍA, SEMANA, MES, AÑO)
-  // ============================================
-  
-  document.querySelectorAll('.calendar-view-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      // Actualizar botón activo
-      document.querySelectorAll('.calendar-view-btn').forEach(b => {
-        b.classList.remove('active');
-      });
-      btn.classList.add('active');
-      
-      // Cambiar vista del calendario
-      const view = btn.dataset.view;
-      calendar.changeView(view);
-    });
-  });
-
-  // ============================================
-  // FUNCIONES DEL MODAL
-  // ============================================
-  
-  function openModal(date) {
-    const options = { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    };
-    const timeOptions = { 
-      hour: '2-digit', 
-      minute: '2-digit',
-      hour12: false
-    };
-
-    // Actualizar información en el modal
-    document.getElementById('selectedDate').textContent = 
-      date.toLocaleDateString('es-ES', options);
-    document.getElementById('selectedTime').textContent = 
-      date.toLocaleTimeString('es-ES', timeOptions);
-    document.getElementById('modalSubtitle').textContent = 
-      'Complete el formulario para confirmar su cita';
-    
-    // Mostrar modal
-    modal.classList.add('active');
-    document.body.style.overflow = 'hidden'; // Prevenir scroll
-  }
-
-  function closeModal() {
-    modal.classList.remove('active');
-    document.body.style.overflow = ''; // Restaurar scroll
-    form.reset();
-    selectedSlot = null;
-  }
-
-  // Cerrar modal con botón X
-  document.getElementById('closeModal').addEventListener('click', closeModal);
-
-  // Cerrar modal al hacer clic en el overlay
-  modal.querySelector('.appointment-modal__overlay').addEventListener('click', closeModal);
-
-  // Cerrar modal con tecla ESC
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && modal.classList.contains('active')) {
-      closeModal();
-    }
-  });
-
-  // ============================================
-  // ENVIAR FORMULARIO DE RESERVA
-  // ============================================
-  
-  form.addEventListener("submit", async (e) => {
+  /* 9. Envío del formulario (mismo comportamiento que antes) */
+  form.addEventListener('submit', async e => {
     e.preventDefault();
-    
-    // Recopilar datos del formulario
-    const formData = new FormData(form);
-    const data = Object.fromEntries(formData);
+    const data = Object.fromEntries(new FormData(form));
     data.datetime_start = selectedSlot.toISOString();
     data.duration_minutes = 30;
 
     try {
-      // OPCIÓN 1: Simulación (para desarrollo)
-      // Comentar esto cuando tengas el backend listo
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      showAlert('✅ ¡Cita agendada exitosamente! Recibirás un correo de confirmación.', 'success');
-      
+      /* simulación */
+      await new Promise(r => setTimeout(r, 800));
+      showAlert('✅ Cita agendada. Revisa tu correo.', 'success');
       closeModal();
-      calendar.refetchEvents(); // Recargar eventos
-      
-      // OPCIÓN 2: Llamada real a la API
-      // Descomentar esto cuando tengas tu backend configurado
-      /*
-      const res = await fetch("/api/appointments", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-      });
-
-      if (res.ok) {
-        const result = await res.json();
-        showAlert('✅ ¡Cita agendada exitosamente! Revisa tu correo.', 'success');
-        closeModal();
-        calendar.refetchEvents();
-      } else {
-        const err = await res.json();
-        showAlert(`❌ ${err.message || "Error al reservar la cita"}`, 'error');
-      }
-      */
-    } catch (error) {
-      console.error('Error:', error);
-      showAlert("❌ Error al procesar la solicitud. Intenta nuevamente.", 'error');
+      calendar.refetchEvents(); // cuando uses API real
+      /* Aquí iría el fetch real a tu endpoint cuando lo tengas */
+    } catch (err) {
+      console.error(err);
+      showAlert('❌ Error al reservar. Intenta nuevamente.', 'error');
     }
   });
 
-  // ============================================
-  // SISTEMA DE ALERTAS
-  // ============================================
-  
-  function showAlert(message, type = 'info') {
-    const alert = document.getElementById('customAlert');
-    const content = alert.querySelector('.custom-alert__content');
-    
-    content.textContent = message;
-    alert.classList.add('show');
-
-    // Auto-ocultar después de 4 segundos
-    setTimeout(() => {
-      alert.classList.remove('show');
-    }, 4000);
+  /* 10. Sistema de alertas (sin cambios) */
+  function showAlert(msg, type = 'info') {
+    const box = document.getElementById('customAlert');
+    if (!box) return;
+    box.querySelector('.custom-alert__content').textContent = msg;
+    box.classList.add('show');
+    setTimeout(() => box.classList.remove('show'), 4000);
   }
 
-  // ============================================
-  // HELPER: Formatear fecha para display
-  // ============================================
-  
-  function formatDate(date) {
-    const options = { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    };
-    return date.toLocaleDateString('es-ES', options);
-  }
+  /* 11. Tema oscuro / claro (sin cambios) */
+  const observer = new MutationObserver(() => calendar.render());
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
-  // ============================================
-  // INICIALIZACIÓN ADICIONAL
-  // ============================================
-  
-  // Ajustar tema del calendario según tema actual
-  const currentTheme = document.documentElement.getAttribute('data-theme');
-  updateCalendarTheme(currentTheme);
-
-  // Observar cambios de tema
-  const observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      if (mutation.attributeName === 'data-theme') {
-        const newTheme = document.documentElement.getAttribute('data-theme');
-        updateCalendarTheme(newTheme);
-      }
-    });
-  });
-
-  observer.observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ['data-theme']
-  });
-
-  function updateCalendarTheme(theme) {
-    // Aquí podrías agregar lógica adicional si necesitas
-    // actualizar colores específicos del calendario según el tema
-    if (calendar) {
-      calendar.render();
-    }
-  }
-
-  // Log para debugging (eliminar en producción)
-  console.log('📅 Calendario inicializado correctamente');
-  console.log('Vista inicial:', calendar.view.type);
+  console.log('📅 Calendario mes+horarios+formulario cargado');
 });

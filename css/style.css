@@ -40,8 +40,11 @@ body {
 
 .hero__subtitle {
   font-size: clamp(1.5rem, 4vw, 2.5rem);
-  color: #e0e0e0;
-  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.6);
+  opacity: 1 !important;
+  animation: none !important;
+    font-family: 'Georgia', 'Times New Roman', serif;
+  font-weight: 500;
+  letter-spacing: 0.5px;
 }
 
 .section-heading {
@@ -351,7 +354,6 @@ section {
 
 /* Aplicar a títulos h1 con spans */
 h1 span:first-of-type {
-  color: var(--accent);
   font-size: 0.35em;
 }
 
@@ -463,8 +465,12 @@ section {
 }
 
 .about__text p { 
-  margin-bottom: 15px; 
-  font-size: var(--fz-md); 
+  margin-bottom: 15px;
+  font-size: var(--fz-md);   /* tamaño original */
+  
+  /* nuevos valores */
+  font-size: 1.125rem;       /* 18 px si root = 16 px → más grande */
+  text-align: justify;       /* justificado */
 }
 
 .skills-list {
@@ -1041,4 +1047,78 @@ section {
 
 .Btn:hover .svgContainer {
   background-color: rgba(156, 156, 156, 0.466);
+}
+
+/* ------------------------------------------------------
+  HORARIOS DISPONIBLES (DENTRO DEL MODAL)
+------------------------------------------------------ */
+.slots-wrapper {
+  margin: 0 24px 24px;
+}
+
+.slots-wrapper > p {
+  font-family: var(--font-mono);
+  font-size: var(--fz-sm);
+  color: var(--accent);
+  margin-bottom: 16px;
+  letter-spacing: .5px;
+}
+
+/* grillita de botones */
+.slots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 10px;
+}
+
+/* botón de hora */
+.slot-btn {
+  padding: 10px 8px;
+  border: 1px solid var(--lightest-navy);
+  background: transparent;
+  color: var(--lightest-slate);
+  border-radius: 4px;
+  font-size: var(--fz-xs);
+  font-family: var(--font-mono);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.slot-btn.free:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.slot-btn.busy {
+  opacity: .35;
+  cursor: not-allowed;
+}
+
+/* pequeña animación al aparecer */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.slots-wrapper {
+  animation: fadeIn .4s ease;
+}
+
+/* ------------------------------------------------------
+  AJUSTES RÁPIDOS AL MODAL (opcional pero queda más fino)
+------------------------------------------------------ */
+.appointment-slot-info {
+  padding: 0 24px;
+  margin-bottom: 20px;
+  font-size: var(--fz-sm);
+  color: var(--slate);
+  border-left: 2px solid var(--accent);
+  padding-left: 12px;
+}
+
+/* separador ligero entre horarios y formulario */
+.form-reserva {
+  border-top: 1px solid var(--lightest-navy);
+  padding-top: 24px;
 }
