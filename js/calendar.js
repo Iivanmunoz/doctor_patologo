@@ -121,24 +121,32 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && modal.classList.contains('active')) closeModal(); });
 
   /* 9. Envío del formulario (mismo comportamiento que antes) */
-  form.addEventListener('submit', async e => {
-    e.preventDefault();
-    const data = Object.fromEntries(new FormData(form));
-    data.datetime_start = selectedSlot.toISOString();
-    data.duration_minutes = 30;
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
 
-    try {
-      /* simulación */
-      await new Promise(r => setTimeout(r, 800));
-      showAlert('✅ Cita agendada. Revisa tu correo.', 'success');
-      closeModal();
-      calendar.refetchEvents(); // cuando uses API real
-      /* Aquí iría el fetch real a tu endpoint cuando lo tengas */
+  const data = Object.fromEntries(new FormData(form));
+  data.datetime_start = selectedSlot.toISOString();
+  data.duration_minutes = 30;
+
+  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbxqHCnRZbNCWFoVnLSXEArYB3EpBh4-2IlGw8l_OZqT7XUg4iOvNGjlw7_foe5KJzdgiQ/exec';
+
+  try {
+
+      const res = await fetch(ENDPOINT, {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: { 'Content-Type': 'text/plain' } // GAS lo exige
+
+      });
+
+      if (!res.ok) throw new Error('No se guardó');
+        showAlert('✅ Cita agendada. Revisa tu correo.', 'success');
+        closeModal();
     } catch (err) {
       console.error(err);
       showAlert('❌ Error al reservar. Intenta nuevamente.', 'error');
     }
-  });
+});
 
   /* 10. Sistema de alertas (sin cambios) */
   function showAlert(msg, type = 'info') {
