@@ -1131,3 +1131,99 @@ section {
   margin: 0 auto 20px;
   letter-spacing: 1px;
 }
+/* ------------------------------------------------------
+  SERVICIOS  (mismo comportamiento que EXPERIENCIA)
+------------------------------------------------------ */
+.services {
+  padding: 120px 0;
+  margin-bottom: 0;
+}
+
+.services__inner {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  max-width: 900px;   /* mismo ancho que experiencia */
+  margin: 0 auto;
+}
+
+.service {
+  position: relative;
+  padding: 25px 30px 25px 50px;   /* espacio para la ▸ */
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.service:hover {
+  background: var(--light-navy);
+  transform: translateX(4px);   /* pequeño desplazamiento */
+}
+
+/* iconito ▸ igual que en jobs */
+.service::before {
+  content: "▸";
+  position: absolute;
+  left: -20px;
+  top: 28px;
+  color: var(--accent);
+  font-size: 20px;
+}
+
+.service__title {
+  margin: 0 0 8px;
+  font-size: var(--fz-lg);
+  color: var(--accent);
+}
+
+.service__description {
+  font-size: var(--fz-md);
+  color: var(--light-slate);
+}
+
+/* ------------------------------------------------------
+  COMENTARIOS  (mismo comportamiento que EXPERIENCIA)
+------------------------------------------------------ */
+.comments__inner {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  max-width: 900px;   /* mismo ancho que experiencia */
+  margin: 0 auto;
+}
+
+.comment {
+  position: relative;
+  padding: 25px 30px 25px 50px;
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.comment:hover {
+  background: var(--light-navy);
+  transform: translateX(4px);
+}
+
+.comment::before {
+  content: "▸";
+  position: absolute;
+  left: -20px;
+  top: 28px;
+  color: var(--accent);
+  font-size: 20px;
+}
+
+.comment__text {
+  font-size: var(--fz-md);
+  color: var(--light-slate);
+  margin-bottom: 10px;
+}
+
+.comment__author {
+  font-size: var(--fz-sm);
+  color: var(--accent);
+  font-style: italic;
+}
