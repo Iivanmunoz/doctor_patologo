@@ -178,9 +178,5 @@ form.addEventListener('submit', async (e) => {
     setTimeout(() => box.classList.remove('show'), 4000);
   }
 
-  /* 11. Tema oscuro / claro (sin cambios) */
-  const observer = new MutationObserver(() => calendar.render());
-  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
-  console.log('📅 Calendario mes+horarios+formulario cargado');
 });
