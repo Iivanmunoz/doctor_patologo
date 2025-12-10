@@ -109,12 +109,33 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
   calendar.render();
+  /* ===== mostrar mes / año ===== */
+const titleEl = document.getElementById('calendarTitle');
+
+function updateTitle() {
+  /* día central del grid (siempre dentro del mes que ves) */
+  const start = calendar.view.currentStart;   // celda 0,0
+  const mid   = new Date(start);
+  mid.setDate(mid.getDate() + 20);            // ≈ mitad del grid 42 celdas
+
+  titleEl.textContent = mid.toLocaleDateString('es-ES',
+                             { month: 'long', year: 'numeric' })
+                           .replace(/^./, c => c.toUpperCase());
+}
+               
+
+updateTitle();
 
   /* 7. Navegación mes anterior/siguiente / hoy */
-  document.getElementById('prevBtn')?.addEventListener('click', () => calendar.prev());
-  document.getElementById('nextBtn')?.addEventListener('click', () => calendar.next());
-  document.getElementById('todayBtn')?.addEventListener('click', () => calendar.today());
-
+document.getElementById('prevBtn').addEventListener('click', () => {
+  calendar.prev();  updateTitle();
+});
+document.getElementById('nextBtn').addEventListener('click', () => {
+  calendar.next();  updateTitle();
+});
+document.getElementById('todayBtn').addEventListener('click', () => {
+  calendar.today(); updateTitle();
+});
   /* 8. Cerrar modal */
   document.getElementById('closeModal')?.addEventListener('click', closeModal);
   modal.querySelector('.appointment-modal__overlay')?.addEventListener('click', closeModal);

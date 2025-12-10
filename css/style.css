@@ -1122,3 +1122,12 @@ section {
   border-top: 1px solid var(--lightest-navy);
   padding-top: 24px;
 }
+
+.calendar-title {
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: var(--fz-lg);
+  color: var(--accent);
+  margin: 0 auto 20px;
+  letter-spacing: 1px;
+}
