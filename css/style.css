@@ -602,7 +602,7 @@ section {
   margin: 0;
   padding-left: 25px;
   font-size: var(--fz-md);
-  color: var(--light-slate);
+  color: #ffffff;
 }
 
 .job__list li { 
@@ -1179,7 +1179,7 @@ section {
 
 .service__description {
   font-size: var(--fz-md);
-  color: var(--light-slate);
+  color: #ffffff;
 }
 
 /* ------------------------------------------------------
@@ -1218,7 +1218,7 @@ section {
 
 .comment__text {
   font-size: var(--fz-md);
-  color: var(--light-slate);
+  color: #ffffff;
   margin-bottom: 10px;
 }
 
